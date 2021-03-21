@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ajchemist</groupId>
+  <artifactId>telegram.clj</artifactId>
+  <version>2021.80.46708</version>
+  <scm>
+    <url>https://github.com/ajchemist/telegram.clj</url>
+  </scm>
+  <dependencies>
+    <dependency>
+      <groupId>cheshire</groupId>
+      <artifactId>cheshire</artifactId>
+      <version>5.10.0</version>
+    </dependency>
+    <dependency>
+      <groupId>clj-http</groupId>
+      <artifactId>clj-http</artifactId>
+      <version>3.12.1</version>
+    </dependency>
+    <dependency>
+      <groupId>user.ring</groupId>
+      <artifactId>user.ring</artifactId>
+      <version>2020.351.49995</version>
+    </dependency>
+  </dependencies>
+  <repositories>
+    <repository>
+      <id>clojars</id>
+      <url>https://repo.clojars.org/</url>
+    </repository>
+  </repositories>
+  <build>
+    <sourceDirectory>src/core</sourceDirectory>
+  </build>
+</project>
