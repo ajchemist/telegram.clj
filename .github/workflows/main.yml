@@ -1,0 +1,141 @@
+name: Main CI
+
+
+on:
+  push:
+    branches: [ master ]
+    # branches-ignore:
+    #   - '**'
+  pull_request:
+    branches: [ master ]
+
+
+jobs:
+  test:
+    if: "!(contains(github.event.head_commit.message, 'ci skip') || contains(github.event.head_commit.message, 'skip ci'))"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        graalvm-version: [ "21.0.0.java11" ]
+        clojure: [ "1.10.2.796" ]
+    name: test @ JDK = ${{ matrix.graalvm-version }} CLJ = ${{ matrix.clojure }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache local maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/deps.edn') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Cache gitlibs
+        uses: actions/cache@v2
+        with:
+          path: ~/.gitlibs
+          key: ${{ runner.os }}-gitlibs-${{ hashFiles('**/deps.edn') }}
+          restore-keys: |
+            ${{ runner.os }}-gitlibs-
+      - name: Setup graalvm-ce
+        uses: DeLaGuardo/setup-graalvm@master
+        with:
+          graalvm-version: ${{ matrix.graalvm-version }}
+      - name: Set up clojure-cli
+        uses: DeLaGuardo/setup-clojure@master
+        with:
+          cli: ${{ matrix.clojure }}
+      - name: Test runner
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_TO: ${{ secrets.TELEGRAM_TO }}
+        run: |
+          clojure -M:provided:test:test-runner
+
+
+      - name: Job digest -> telegram
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_TO: ${{ secrets.TELEGRAM_TO }}
+          JOB_CONTEXT: ${{ toJSON(job) }}
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: |
+          clojure -X:provided:test github.core.alpha.actions-helper.telegram/send-job-digest
+
+
+  package:
+    needs: [ test ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache local maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/deps.edn') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Cache gitlibs
+        uses: actions/cache@v2
+        with:
+          path: ~/.gitlibs
+          key: ${{ runner.os }}-gitlibs-${{ hashFiles('**/deps.edn') }}
+          restore-keys: |
+            ${{ runner.os }}-gitlibs-
+      - name: Setup graalvm-ce
+        uses: DeLaGuardo/setup-graalvm@master
+        with:
+          graalvm-version: '21.0.0.java11'
+      - name: Set up clojure-cli
+        uses: DeLaGuardo/setup-clojure@master
+        with:
+          cli: '1.10.2.796'
+      - name: Preparation
+        run: |
+          cp .ci/settings.xml $HOME/.m2/
+          mvn dependency:get -Dartifact=org.apache.maven.plugins:maven-deploy-plugin:2.8
+
+
+      - name: Make package
+        env:
+          LIBRARY: ajchemist/telegram.clj
+        run: clojure -M:provided:test -m user.tools.deps.script.package -r $LIBRARY
+
+
+      - name: Edit pom
+        run: clojure -M:provided:test -m user.apache.maven.script.edit-pom --scm-url $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
+
+
+      - name: Deploy
+        env:
+          CLOJARS_USERNAME: ${{ secrets.CLOJARS_USERNAME }}
+          CLOJARS_PASSWORD: ${{ secrets.CLOJARS_PASSWORD }}
+        run: mvn deploy:deploy-file -DpomFile="pom.xml" -Dfile="target/package.jar" -Dpackaging=jar -DrepositoryId="clojars" -Durl="https://clojars.org/repo"
+
+
+      - name: Push a commit using the built-in token
+        run: |
+          git config --local user.name $GITHUB_ACTOR
+          git config --local user.email $(git --no-pager show --format="<%ae>" -s HEAD)
+          git add -- pom.xml
+          git commit -m "$(clojure -A:provided:test -m user.apache.maven.script.get-pom-version) [ci skip]"
+          git remote -v
+          git push
+
+
+      - name: Job digest -> telegram
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_TO: ${{ secrets.TELEGRAM_TO }}
+          JOB_CONTEXT: ${{ toJSON(job) }}
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: |
+          clojure -X:provided:test github.core.alpha.actions-helper.telegram/send-job-digest
+
+
+      - uses: 8398a7/action-slack@v3.5.0
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took # selectable (default: repo,message)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # optional
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+        if: always() # Pick up events even if the job fails or is canceled.
