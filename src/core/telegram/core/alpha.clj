@@ -92,6 +92,21 @@
      :telegram/method "/deleteWebhook"}))
 
 
+(defn get-commands
+  [token]
+  (request
+    {:telegram/token  token
+     :telegram/method "/getMyCommands"}))
+
+
+(defn set-commands
+  [token commands]
+  (request
+    {:telegram/token  token
+     :telegram/method "/getMyCommands"
+     :form-params     {:commands commands}}))
+
+
 (defn get-me
   [token]
   (request
@@ -110,12 +125,12 @@
 
 
 (defn send-message
-  [token chat-id options message]
+  [token to message options]
   (request
     {:telegram/token  token
      :telegram/method "/sendMessage"
      :form-params     (into
-                        {:chat_id chat-id
+                        {:chat_id to
                          :text    message}
                         options)}))
 
