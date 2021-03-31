@@ -115,26 +115,40 @@
 
 
 (defn get-updates
-  [token {:keys [limit offset timeout]}]
+  [token {:keys [limit offset timeout allowed_updates]}]
   (request
     {:telegram/token  token
      :telegram/method "/getUpdates"
-     :form-params     {:offset  (or offset 0)
-                       :limit   (or limit 100)
-                       :timeout (or timeout 1)}}))
+     :form-params     (cond-> {:offset  (or offset 0)
+                               :limit   (or limit 100)
+                               :timeout (or timeout 1)}
+                        (vector? allowed_updates) (assoc :allowed_updates allowed_updates))}))
 
 
 (defn send-message
-  [token to message options]
-  (request
-    {:telegram/token  token
-     :telegram/method "/sendMessage"
-     :form-params     (into
-                        {:chat_id to
-                         :text    message}
-                        options)}))
+  ([token to message]
+   (send-message token to message nil))
+  ([token to message options]
+   (request
+     {:telegram/token  token
+      :telegram/method "/sendMessage"
+      :form-params     (into
+                         {:chat_id to
+                          :text    message}
+                         options)})))
+
+
+(defn answer-callback-query
+  ([token id]
+   (answer-callback-query token id nil))
+  ([token id options]
+   (request
+     {:telegram/token  token
+      :telegram/method "/answerCallbackQuery"
+      :form-params     (into
+                         {:callback_query_id id}
+                         options)})))
 
 
 (comment
-
   )
