@@ -9,6 +9,7 @@
              clojure.string
              clojure.test
              reitit.core
+             clojure.spec.alpha
              ]}
   :unused-referred-var
   {:exclude {clojure.test [is are deftest testing]}}
