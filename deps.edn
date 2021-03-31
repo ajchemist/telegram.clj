@@ -22,7 +22,7 @@
    :extra-deps
    {
     rum/rum                    {:mvn/version "0.11.5"}
-    ajchemist/github.clj.alpha {:mvn/version "2021.80.46410"}
+    ajchemist/github.clj.alpha {:mvn/version "2021.89.10972"}
 
     org.clojure/tools.cli                       {:mvn/version "1.0.194"}
     org.clojure/tools.deps.alpha                {:mvn/version "0.9.821"}
