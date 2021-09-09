@@ -11,6 +11,7 @@ on:
 
 
 env:
+  clojure-cli: "1.10.3.967"
   library: io.github.ajchemist/telegram.clj
 
 
@@ -21,7 +22,7 @@ jobs:
     strategy:
       matrix:
         java: [ "11" ]
-        clojure: [ "1.10.3.967" ]
+        clojure: [ "1.10" ]
     name: test @ JDK = ${{ matrix.java }} CLJ = ${{ matrix.clojure }}
     steps:
       - uses: actions/checkout@v2
@@ -47,7 +48,7 @@ jobs:
       - name: Set up clojure-cli
         uses: DeLaGuardo/setup-clojure@master
         with:
-          cli: ${{ matrix.clojure }}
+          cli: ${{ env.clojure-cli }}
       - name: Test runner
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
@@ -93,7 +94,7 @@ jobs:
       - name: Set up clojure-cli
         uses: DeLaGuardo/setup-clojure@master
         with:
-          cli: '1.10.3.967'
+          cli: ${{ env.clojure-cli }}
       - name: Preparation
         run: |
           cp .ci/settings.xml $HOME/.m2/
@@ -129,7 +130,7 @@ jobs:
           JOB_CONTEXT: ${{ toJSON(job) }}
           GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: |
-          clojure -X:provided:test:github-actions-helper github.core.alpha.actions-helper.telegram/send-job-digest
+          clojure -X:provided:test:github-actions-helper send-job-digest
 
 
       - uses: 8398a7/action-slack@v3.5.0

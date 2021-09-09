@@ -37,7 +37,8 @@
    {
     rum/rum                    {:mvn/version "0.11.5"}
     ajchemist/github.clj.alpha {:mvn/version "2021.89.10972"}
-    }}
+    }
+   :ns-default github.core.alpha.actions-helper.telegram}
 
 
   :build
