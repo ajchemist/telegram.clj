@@ -64,7 +64,7 @@ jobs:
           JOB_CONTEXT: ${{ toJSON(job) }}
           GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: |
-          clojure -X:provided:test:github-actions-helper github.core.alpha.actions-helper.telegram/send-job-digest
+          clojure -X:provided:test:github-actions-helper telegram-job-digest
 
 
   package:
@@ -130,7 +130,7 @@ jobs:
           JOB_CONTEXT: ${{ toJSON(job) }}
           GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: |
-          clojure -X:provided:test:github-actions-helper send-job-digest
+          clojure -X:provided:test:github-actions-helper telegram-job-digest
 
 
       - uses: 8398a7/action-slack@v3.5.0

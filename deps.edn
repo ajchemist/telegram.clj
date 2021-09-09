@@ -31,10 +31,10 @@
   :github-actions-helper
   {:extra-deps
    {
-    rum/rum                    {:mvn/version "0.11.5"}
-    ajchemist/github.clj.alpha {:mvn/version "2021.89.10972"}
+    rum/rum                              {:mvn/version "0.11.5"}
+    io.github.ajchemist/github.clj.alpha {:mvn/version "2021.252.17497"}
     }
-   :ns-default github.core.alpha.actions-helper.telegram}
+   :ns-default github.core.alpha.actions-helper.api}
 
 
   :build
