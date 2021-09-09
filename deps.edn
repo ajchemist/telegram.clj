@@ -8,10 +8,6 @@
   }
 
 
- :deps/prep-lib {:alias  :build
-                 :ensure "target/classes"}
-
-
  :aliases
  {
   :provided
