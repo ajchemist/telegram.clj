@@ -10,15 +10,19 @@ on:
     branches: [ master ]
 
 
+env:
+  library: io.github.ajchemist/telegram.clj
+
+
 jobs:
   test:
     if: "!(contains(github.event.head_commit.message, 'ci skip') || contains(github.event.head_commit.message, 'skip ci'))"
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        graalvm-version: [ "21.0.0.java11" ]
-        clojure: [ "1.10.2.796" ]
-    name: test @ JDK = ${{ matrix.graalvm-version }} CLJ = ${{ matrix.clojure }}
+        java: [ "11" ]
+        clojure: [ "1.10.3.967" ]
+    name: test @ JDK = ${{ matrix.java }} CLJ = ${{ matrix.clojure }}
     steps:
       - uses: actions/checkout@v2
       - name: Cache local maven repository
@@ -35,10 +39,11 @@ jobs:
           key: ${{ runner.os }}-gitlibs-${{ hashFiles('**/deps.edn') }}
           restore-keys: |
             ${{ runner.os }}-gitlibs-
-      - name: Setup graalvm-ce
-        uses: DeLaGuardo/setup-graalvm@master
+      - name: Setup java
+        uses: actions/setup-java@v2
         with:
-          graalvm-version: ${{ matrix.graalvm-version }}
+          distribution: 'zulu'
+          java-version: ${{ matrix.java }}
       - name: Set up clojure-cli
         uses: DeLaGuardo/setup-clojure@master
         with:
@@ -48,7 +53,7 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_TO: ${{ secrets.TELEGRAM_TO }}
         run: |
-          clojure -M:provided:test:test-runner
+          clojure -X:provided:test:test-runner
 
 
       - name: Job digest -> telegram
@@ -58,7 +63,7 @@ jobs:
           JOB_CONTEXT: ${{ toJSON(job) }}
           GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: |
-          clojure -X:provided:test github.core.alpha.actions-helper.telegram/send-job-digest
+          clojure -X:provided:test:github-actions-helper github.core.alpha.actions-helper.telegram/send-job-digest
 
 
   package:
@@ -80,14 +85,15 @@ jobs:
           key: ${{ runner.os }}-gitlibs-${{ hashFiles('**/deps.edn') }}
           restore-keys: |
             ${{ runner.os }}-gitlibs-
-      - name: Setup graalvm-ce
-        uses: DeLaGuardo/setup-graalvm@master
+      - name: Setup java
+        uses: actions/setup-java@v2
         with:
-          graalvm-version: '21.0.0.java11'
+          distribution: 'zulu'
+          java-version: '11'
       - name: Set up clojure-cli
         uses: DeLaGuardo/setup-clojure@master
         with:
-          cli: '1.10.2.796'
+          cli: '1.10.3.967'
       - name: Preparation
         run: |
           cp .ci/settings.xml $HOME/.m2/
@@ -95,13 +101,8 @@ jobs:
 
 
       - name: Make package
-        env:
-          LIBRARY: ajchemist/telegram.clj
-        run: clojure -M:provided:test -m user.tools.deps.script.package -r $LIBRARY
-
-
-      - name: Edit pom
-        run: clojure -M:provided:test -m user.apache.maven.script.edit-pom --scm-url $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
+        run: |
+          clojure -T:provided:build jar :lib ${{ env.library }}
 
 
       - name: Deploy
@@ -116,7 +117,7 @@ jobs:
           git config --local user.name $GITHUB_ACTOR
           git config --local user.email $(git --no-pager show --format="<%ae>" -s HEAD)
           git add -- pom.xml
-          git commit -m "$(clojure -A:provided:test -m user.apache.maven.script.get-pom-version) [ci skip]"
+          git commit -m "$(clojure -X:build:maven-tool print-pom-version) [ci skip]"
           git remote -v
           git push
 
@@ -128,7 +129,7 @@ jobs:
           JOB_CONTEXT: ${{ toJSON(job) }}
           GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: |
-          clojure -X:provided:test github.core.alpha.actions-helper.telegram/send-job-digest
+          clojure -X:provided:test:github-actions-helper github.core.alpha.actions-helper.telegram/send-job-digest
 
 
       - uses: 8398a7/action-slack@v3.5.0

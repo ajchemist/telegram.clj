@@ -3,7 +3,6 @@
    [clojure.test :as test :refer [deftest is are testing]]
    [clojure.string :as str]
    [telegram.core.alpha :as tg]
-   #_[rum.core :as rum]
    ))
 
 
