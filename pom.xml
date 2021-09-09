@@ -1,23 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>ajchemist</groupId>
+  <groupId>io.github.ajchemist</groupId>
   <artifactId>telegram.clj</artifactId>
-  <version>2021.90.30128</version>
+  <version>2021.252.9058</version>
   <scm>
     <url>https://github.com/ajchemist/telegram.clj</url>
   </scm>
   <dependencies>
     <dependency>
-      <groupId>cheshire</groupId>
-      <artifactId>cheshire</artifactId>
-      <version>5.10.0</version>
+      <groupId>org.clojure</groupId>
+      <artifactId>clojure</artifactId>
+      <version>1.10.3</version>
     </dependency>
     <dependency>
       <groupId>clj-http</groupId>
       <artifactId>clj-http</artifactId>
-      <version>3.12.1</version>
+      <version>3.12.3</version>
+    </dependency>
+    <dependency>
+      <groupId>cheshire</groupId>
+      <artifactId>cheshire</artifactId>
+      <version>5.10.0</version>
     </dependency>
     <dependency>
       <groupId>user.ring</groupId>
@@ -34,4 +38,5 @@
   <build>
     <sourceDirectory>src/core</sourceDirectory>
   </build>
+  <name>telegram.clj</name>
 </project>
