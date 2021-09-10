@@ -139,4 +139,73 @@
     (telegram-event raw-update)))
 
 
+(defn context-handler
+  "`handlers` is a map of [ :kind -> handler ] "
+  [handlers]
+  (fn [{:keys [event] :as context}]
+    (let [f (handlers (:kind event) (fn [_]))]
+      (f context))))
+
+
+(defn message-handler
+  [command-handler etc]
+  (fn
+    [{:keys [event] :as context}]
+    (let [text   (get-in event [:data "text"])
+          parsed (parse-text text)]
+      (when (map? parsed)
+        (let [{:keys [command args]} parsed]
+          (if (and (string? command) (not (str/blank? command)))
+            (command-handler context command args)
+            (etc context)))))))
+
+
+;; ** command
+
+
+(def ^:dynamic *no-command-permission-message* "🔴 커맨드 사용권한 없음")
+
+
+(defn allow?
+  "Return ture if requirements is empty"
+  [h requirements role]
+  (every? #(isa? h role %) requirements))
+
+
+(comment
+  (and
+    (allow? (make-hierarchy) #{} :user-1)
+    (allow? (make-hierarchy) #{} :user-2)
+    (allow? (make-hierarchy) #{} nil))
+
+
+  (allow? (-> (make-hierarchy) (derive :alpha :admin)) #{:alpha} :user)
+  (allow? (-> (make-hierarchy) (derive :alpha :admin)) #{:alpha} :admin)
+  (allow? (-> (make-hierarchy) (derive :alpha :admin)) #{:alpha} :alpha)
+  (allow? (-> (make-hierarchy) (derive :alpha :admin)) #{:admin} :alpha)
+  )
+
+
+(defn context-command-handler
+  [cmd-defs role-tree]
+  (fn
+    [context command args]
+    (let [handler (get-in cmd-defs [command :handler])]
+      (if (fn? handler)
+        (if (allow? role-tree (get-in cmd-defs [command :requirements]) (:role context))
+          (apply handler context args)
+          (send-message context (str *no-command-permission-message* ": " command)))
+        nil))))
+
+
+(defn callback-query-handler
+  [do-operaion]
+  (fn
+    [context]
+    (let [callback-data (get-in context [:event :data "data"])
+          [operation]   (str/split callback-data #"\s+" 2)
+          op            (keyword operation)]
+      (do-operaion context op))))
+
+
 (set! *warn-on-reflection* false)

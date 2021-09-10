@@ -14,18 +14,26 @@
   {:extra-deps
    {
     org.clojure/clojure {:mvn/version "1.10.3"}
+    metosin/reitit      {:mvn/version "0.5.15"}
+    ring/ring-core      {:mvn/version "1.9.4"}
     }}
 
 
   :test
-  {:extra-paths ["src/test"]}
+  {:extra-paths ["src/test"]
+   :extra-deps
+   {
+    io.github.clojure/tools.build {:git/tag "v0.2.2" :git/sha "3049217"}
+    ring/ring-jetty-adapter       {:mvn/version "1.9.4"}
+    }}
 
 
   :test-runner
   {:extra-deps {io.github.cognitect-labs/test-runner {:git/tag "v0.5.0" :git/sha "b3fd0d2"}}
    :main-opts  ["-m" "cognitect.test-runner" "-d" "src/test"]
    :exec-fn    cognitect.test-runner.api/test
-   :exec-args  {:dirs ["src/test"]}}
+   :exec-args  {:dirs     ["src/test"]
+                :excludes #{:live}}}
 
 
   :github-actions-helper
