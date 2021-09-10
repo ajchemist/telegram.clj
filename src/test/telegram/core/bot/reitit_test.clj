@@ -63,12 +63,14 @@
   )
 
 
-(def server
-  (jetty/run-jetty
-    #'ring-handler
-    {:host  "0.0.0.0"
-     :port  8080
-     :join? false}))
+(comment
+  (def server
+    (jetty/run-jetty
+      #'ring-handler
+      {:host  "0.0.0.0"
+       :port  8080
+       :join? false}))
+  )
 
 
 (comment

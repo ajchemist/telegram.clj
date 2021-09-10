@@ -33,7 +33,7 @@
    :main-opts  ["-m" "cognitect.test-runner" "-d" "src/test"]
    :exec-fn    cognitect.test-runner.api/test
    :exec-args  {:dirs     ["src/test"]
-                :excludes #{:live}}}
+                :excludes [:live]}}
 
 
   :github-actions-helper
