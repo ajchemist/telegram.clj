@@ -22,16 +22,16 @@
 
 
   :test-runner
-  {:extra-paths ["test"]
-   :extra-deps  {io.github.cognitect-labs/test-runner {:git/tag "v0.5.0" :git/sha "b3fd0d2"}}
-   :main-opts   ["-m" "cognitect.test-runner"]
-   :exec-fn     cognitect.test-runner.api/test}
+  {:extra-deps {io.github.cognitect-labs/test-runner {:git/tag "v0.5.0" :git/sha "b3fd0d2"}}
+   :main-opts  ["-m" "cognitect.test-runner" "-d" "src/test"]
+   :exec-fn    cognitect.test-runner.api/test
+   :exec-args  {:dirs ["src/test"]}}
 
 
   :github-actions-helper
   {:extra-deps
    {
-    rum/rum                              {:mvn/version "0.11.5"}
+    rum/rum                              {:mvn/version "0.12.6"}
     io.github.ajchemist/github.clj.alpha {:mvn/version "2021.252.17497"}
     }
    :ns-default github.core.alpha.actions-helper.api}
