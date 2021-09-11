@@ -151,13 +151,14 @@
   [command-handler etc]
   (fn
     [{:keys [event] :as context}]
-    (let [text   (get-in event [:data "text"])
-          parsed (parse-text text)]
-      (when (map? parsed)
-        (let [{:keys [command args]} parsed]
-          (if (and (string? command) (not (str/blank? command)))
-            (command-handler context command args)
-            (etc context)))))))
+    (let [text   (get-in event [:data "text"])]
+      (when (string? text)
+        (let [parsed (parse-text text)]
+          (when (map? parsed)
+            (let [{:keys [command args]} parsed]
+              (if (and (string? command) (not (str/blank? command)))
+                (command-handler context command args)
+                (etc context)))))))))
 
 
 ;; ** command
