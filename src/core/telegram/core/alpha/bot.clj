@@ -1,7 +1,8 @@
 (ns telegram.core.alpha.bot
   (:require
    [clojure.string :as str]
-   [clojure.spec.alpha :as spec]
+   [clojure.spec.alpha :as s]
+   [clojure.spec.gen.alpha :as gen]
    [telegram.core.alpha :as tg]
    )
   (:import
@@ -167,6 +168,48 @@
 (def ^:dynamic *no-command-permission-message* "🔴 커맨드 사용권한 없음")
 
 
+(s/def :telegram.core.alpha.bot/telegram-context
+  (s/with-gen
+    #(instance? TelegramContext %)
+    #(gen/fmap
+      (fn [[token data]] (telegram-context token data))
+      (gen/tuple (gen/string-alphanumeric) (gen/map (gen/string-alphanumeric) (gen/string-alphanumeric))))))
+
+
+(s/def :telegram.core.alpha.bot.cmd-defs/cmd-name string?)
+(s/def :telegram.core.alpha.bot.cmd-defs.config/handler
+  (s/fspec :args (s/cat :context :telegram.core.alpha.bot/telegram-context
+                        :args (s/* string?))
+           :ret any?))
+(s/def :telegram.core.alpha.bot.cmd-defs.config/requirements set?)
+(s/def :telegram.core.alpha.bot.cmd-defs/config
+  (s/keys :req-un [:telegram.core.alpha.bot.cmd-defs.config/handler]
+          :opt-un [:telegram.core.alpha.bot.cmd-defs.config/requirements]))
+(s/def :telegram.core.alpha.bot/cmd-defs (s/map-of :telegram.core.alpha.bot.cmd-defs/cmd-name :telegram.core.alpha.bot.cmd-defs/config))
+
+
+(s/def :telegram.core.alpha.bot.role-tree/parents map?)
+(s/def :telegram.core.alpha.bot.role-tree/descendants map?)
+(s/def :telegram.core.alpha.bot.role-tree/ancestors map?)
+(s/def :telegram.core.alpha.bot/role-tree
+  (s/keys :req-un [:telegram.core.alpha.bot.role-tree/parents
+                   :telegram.core.alpha.bot.role-tree/descendants
+                   :telegram.core.alpha.bot.role-tree/ancestors]))
+
+
+(s/fdef expand-cmd-defs
+  :args (s/cat :cmd-defs :telegram.core.alpha.bot/cmd-defs)
+  :ret :telegram.core.alpha.bot/cmd-defs)
+
+
+(s/fdef context-command-handler
+  :args (s/cat :cmd-defs :telegram.core.alpha.bot/cmd-defs :role-tree :telegram.core.alpha.bot/role-tree)
+  :ret fn?)
+
+
+;;
+
+
 (defn allow?
   "Return ture if requirements is empty"
   [h requirements role]
@@ -185,6 +228,18 @@
   (allow? (-> (make-hierarchy) (derive :alpha :admin)) #{:alpha} :alpha)
   (allow? (-> (make-hierarchy) (derive :alpha :admin)) #{:admin} :alpha)
   )
+
+
+(defn expand-cmd-defs
+  [defs]
+  (reduce
+    (fn [ret [cmd-name {:keys [aliases] :as config}]]
+      (let [config' (dissoc config :aliases)]
+        (reduce #(assoc %1 %2 config')
+                (assoc ret cmd-name config')
+                aliases)))
+    {}
+    defs))
 
 
 (defn context-command-handler

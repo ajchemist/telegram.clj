@@ -132,7 +132,7 @@
    (request
      {:telegram/token  token
       :telegram/method "/sendMessage"
-      :form-params     (into
+      :form-params     (merge
                          {:chat_id to
                           :text    message}
                          options)})))
@@ -145,7 +145,7 @@
    (request
      {:telegram/token  token
       :telegram/method "/answerCallbackQuery"
-      :form-params     (into
+      :form-params     (merge
                          {:callback_query_id id}
                          options)})))
 
