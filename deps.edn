@@ -2,7 +2,7 @@
  :paths ["src/core"]
  :deps
  {
-  cheshire/cheshire   {:mvn/version "5.10.0"}
+  cheshire/cheshire   {:mvn/version "5.10.1"}
   clj-http/clj-http   {:mvn/version "3.12.3"}
   user.ring/user.ring {:mvn/version "2020.351.49995"}
   }
@@ -23,7 +23,7 @@
   {:extra-paths ["src/test"]
    :extra-deps
    {
-    io.github.clojure/tools.build {:git/tag "v0.2.2" :git/sha "3049217"}
+    io.github.clojure/tools.build {:git/tag "v0.7.5" :git/sha "34727f7"}
     ring/ring-jetty-adapter       {:mvn/version "1.9.4"}
     }}
 
@@ -46,10 +46,9 @@
 
 
   :build
-  {:deps        {io.github.clojure/tools.build {:git/tag "v0.2.2" :git/sha "3049217"}
-                 user.java.time/user.java.time {:mvn/version "2020.267.10158"}}
-   :extra-paths ["src/test"]
-   :ns-default  build}
+  {:deps       {io.github.clojure/tools.build {:git/tag "v0.7.5" :git/sha "34727f7"}
+                user.java.time/user.java.time {:mvn/version "2020.267.10158"}}
+   :ns-default build.package}
 
 
   :maven-tool

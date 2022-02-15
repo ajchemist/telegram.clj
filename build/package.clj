@@ -1,4 +1,4 @@
-(ns build
+(ns build.package
   (:require
    [clojure.string :as str]
    [clojure.tools.build.api :as build]
