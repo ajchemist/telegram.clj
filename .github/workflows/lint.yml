@@ -3,9 +3,15 @@ name: Lint
 
 on:
   push:
-    branches: [ master ]
+    paths:
+      - '.github/workflows/lint.yml'
+      - 'src/core/**/*.clj'
+      - 'src/core/**/*.cljc'
+    branches:
+      - master
   pull_request:
-    branches: [ master ]
+    branches:
+      - master
 
 
 jobs:
@@ -15,10 +21,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Setup clj-kondo
         uses: DeLaGuardo/setup-clj-kondo@master
         with:
-          version: '2021.08.06'
+          version: '2022.02.09'
       - name: Lint
         run: |
           clj-kondo --lint src/core
