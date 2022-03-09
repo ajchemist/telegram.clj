@@ -3,15 +3,21 @@ name: Main CI
 
 on:
   push:
-    branches: [ master ]
-    # branches-ignore:
-    #   - '**'
+    paths:
+      - '.github/workflows/main.yml'
+      - 'deps.edn'
+      - 'src/core/**/*.clj'
+      - 'src/core/**/*.cljc'
+    branches:
+      - master
   pull_request:
-    branches: [ master ]
+    branches:
+      - master
 
 
 env:
-  clojure-cli: "1.10.3.967"
+  java-version: '17'
+  clojure-cli: "1.10.3.1087"
   library: io.github.ajchemist/telegram.clj
 
 
@@ -21,9 +27,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ "11" ]
         clojure: [ "1.10" ]
-    name: test @ JDK = ${{ matrix.java }} CLJ = ${{ matrix.clojure }}
+    name: test CLJ = ${{ matrix.clojure }}
     steps:
       - uses: actions/checkout@v2
       - name: Cache local maven repository
@@ -44,7 +49,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           distribution: 'zulu'
-          java-version: ${{ matrix.java }}
+          java-version: ${{ env.java-version }}
       - name: Set up clojure-cli
         uses: DeLaGuardo/setup-clojure@master
         with:
@@ -65,6 +70,11 @@ jobs:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: |
           clojure -X:provided:test:github-actions-helper telegram-job-digest
+      - name: Discord actions digest notification
+        if: always() # Pick up events even if the job fails or is canceled.
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: sarisia/actions-status-discord@v1
 
 
   package:
@@ -90,7 +100,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           distribution: 'zulu'
-          java-version: '11'
+          java-version: ${{ env.java-version }}
       - name: Set up clojure-cli
         uses: DeLaGuardo/setup-clojure@master
         with:
@@ -131,13 +141,8 @@ jobs:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: |
           clojure -X:provided:test:github-actions-helper telegram-job-digest
-
-
-      - uses: 8398a7/action-slack@v3.5.0
-        with:
-          status: ${{ job.status }}
-          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took # selectable (default: repo,message)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # optional
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+      - name: Discord actions digest notification
         if: always() # Pick up events even if the job fails or is canceled.
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: sarisia/actions-status-discord@v1

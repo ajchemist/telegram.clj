@@ -13,8 +13,9 @@
   :provided
   {:extra-deps
    {
-    org.clojure/clojure {:mvn/version "1.10.3"}
+    com.taoensso/timbre {:mvn/version "5.1.2"}
     metosin/reitit      {:mvn/version "0.5.15"}
+    org.clojure/clojure {:mvn/version "1.10.3"}
     ring/ring-core      {:mvn/version "1.9.4"}
     }}
 
