@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.ajchemist</groupId>
   <artifactId>telegram.clj</artifactId>
-  <version>2022.68.16350</version>
+  <version>2022.290.49671</version>
   <scm>
     <url>https://github.com/ajchemist/telegram.clj</url>
   </scm>
@@ -11,7 +11,7 @@
     <dependency>
       <groupId>org.clojure</groupId>
       <artifactId>clojure</artifactId>
-      <version>1.10.3</version>
+      <version>1.11.1</version>
     </dependency>
     <dependency>
       <groupId>clj-http</groupId>
@@ -21,12 +21,12 @@
     <dependency>
       <groupId>cheshire</groupId>
       <artifactId>cheshire</artifactId>
-      <version>5.10.1</version>
+      <version>5.11.0</version>
     </dependency>
     <dependency>
-      <groupId>user.ring</groupId>
+      <groupId>io.github.ajchemist</groupId>
       <artifactId>user.ring</artifactId>
-      <version>2020.351.49995</version>
+      <version>2022.290.21542</version>
     </dependency>
   </dependencies>
   <repositories>
