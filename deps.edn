@@ -2,9 +2,9 @@
  :paths ["src/core"]
  :deps
  {
-  cheshire/cheshire   {:mvn/version "5.10.1"}
-  clj-http/clj-http   {:mvn/version "3.12.3"}
-  user.ring/user.ring {:mvn/version "2020.351.49995"}
+  cheshire/cheshire             {:mvn/version "5.11.0"}
+  clj-http/clj-http             {:mvn/version "3.12.3"}
+  io.github.ajchemist/user.ring {:mvn/version "2022.298.6339"}
   }
 
 
@@ -13,10 +13,10 @@
   :provided
   {:extra-deps
    {
-    com.taoensso/timbre {:mvn/version "5.1.2"}
-    metosin/reitit      {:mvn/version "0.5.15"}
-    org.clojure/clojure {:mvn/version "1.10.3"}
-    ring/ring-core      {:mvn/version "1.9.4"}
+    com.taoensso/timbre {:mvn/version "6.0.2"}
+    metosin/reitit      {:mvn/version "0.5.18"}
+    org.clojure/clojure {:mvn/version "1.11.1"}
+    ring/ring-core      {:mvn/version "1.9.6"}
     }}
 
 
@@ -24,31 +24,32 @@
   {:extra-paths ["src/test"]
    :extra-deps
    {
-    io.github.clojure/tools.build {:git/tag "v0.7.5" :git/sha "34727f7"}
-    ring/ring-jetty-adapter       {:mvn/version "1.9.4"}
+    io.github.clojure/tools.build {:git/tag "v0.8.5" :git/sha "9c738da"}
+    ring/ring-jetty-adapter       {:mvn/version "1.9.6"}
     }}
 
 
   :test-runner
-  {:extra-deps {io.github.cognitect-labs/test-runner {:git/tag "v0.5.0" :git/sha "b3fd0d2"}}
+  {:extra-deps {io.github.cognitect-labs/test-runner {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
    :main-opts  ["-m" "cognitect.test-runner" "-d" "src/test"]
    :exec-fn    cognitect.test-runner.api/test
    :exec-args  {:dirs     ["src/test"]
-                :excludes [:live]}}
+                :excludes [:deprecated]}}
 
 
   :github-actions-helper
   {:extra-deps
    {
-    rum/rum                              {:mvn/version "0.12.6"}
-    io.github.ajchemist/github.clj.alpha {:mvn/version "2021.252.17497"}
+    rum/rum                              {:mvn/version "0.12.10"}
+    io.github.ajchemist/github.clj.alpha {:mvn/version "2022.290.48442"}
     }
    :ns-default github.core.alpha.actions-helper.api}
 
 
   :build
-  {:deps       {io.github.clojure/tools.build {:git/tag "v0.7.5" :git/sha "34727f7"}
-                user.java.time/user.java.time {:mvn/version "2020.267.10158"}}
+  {:deps
+   {io.github.clojure/tools.build      {:git/tag "v0.8.5" :git/sha "9c738da"}
+    io.github.ajchemist/user.java.time {:mvn/version "2022.75.23671"}}
    :ns-default build.package}
 
 

@@ -1,0 +1,42 @@
+name: Outdated CI
+
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/outdated.yml'
+      - 'deps.edn'
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+
+env:
+  clojure-cli: latest
+  java-version: "17"
+
+
+jobs:
+  outdated:
+    if: "!(contains(github.event.head_commit.message, 'ci skip') || contains(github.event.head_commit.message, 'skip ci'))"
+    runs-on: ubuntu-latest
+    name: Check outdated deps
+    steps:
+      - uses: actions/checkout@v3
+      # clojure -Ttools install-latest :lib com.github.liquidz/antq :as antq
+      # clojure -Tantq outdated :skip '["pom" "github-action"]'
+      # clojure -S:deps -Tantq help/doc
+      - name: Outdated (Clojure)
+        uses: liquidz/antq-action@main
+        with:
+          skips: "pom github-action"
+
+
+      - name: Discord action job digest notification
+        uses: sarisia/actions-status-discord@v1
+        if: always() # Pick up events even if the job fails or is canceled.
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
