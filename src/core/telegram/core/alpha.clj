@@ -77,6 +77,13 @@
 ;; https://core.telegram.org/bots/api
 
 
+(defn get-webhook-info
+  [token]
+  (request
+    {:telegram/token  token
+     :telegram/method "/getWebhookInfo"}))
+
+
 (defn set-webhook
   [token webhook-url params]
   (request
