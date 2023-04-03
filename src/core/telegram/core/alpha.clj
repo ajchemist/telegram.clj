@@ -78,18 +78,20 @@
 
 
 (defn set-webhook
-  [token webhook-url]
+  [token webhook-url params]
   (request
     {:telegram/token  token
      :telegram/method "/setWebhook"
-     :form-params    {:url webhook-url}}))
+     :form-params    (assoc params
+                       :url webhook-url)}))
 
 
 (defn delete-webhook
-  [token]
+  [token {:keys [drop_pending_updates] :as params}]
   (request
     {:telegram/token  token
-     :telegram/method "/deleteWebhook"}))
+     :telegram/method "/deleteWebhook"
+     :form-params     params}))
 
 
 (defn get-commands
