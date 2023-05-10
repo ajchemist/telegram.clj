@@ -104,22 +104,22 @@
     (get-in event [:data "from" "id"]))
   (get-chat-id
     [_]
-    (let [kind (:kind event)]
-      (cond
-        (#{:message :edited_message :channel_post :edited_channel_post} kind)
-        (get-in event [:data "chat" "id"]))))
+    (get-in event [:data "chat" "id"]))
   (send-message
     [context message]
-    (tg/send-message token (get-chat-id context) message))
+    (send-message context message nil))
   (send-message
     [context message options]
-    (tg/send-message token (get-chat-id context) message options))
+    (let [chat-id (get-chat-id context)]
+      (if (int? chat-id)
+        (tg/send-message token chat-id message options)
+        (tap> [:chat-id-not-found context]))))
   (send-message
     [_ to message options]
     (tg/send-message token to message options))
   (answer-callback-query
-    [_]
-    (tg/answer-callback-query token (get-in event [:data "id"])))
+    [context]
+    (answer-callback-query context nil))
   (answer-callback-query
     [_ options]
     (tg/answer-callback-query token (get-in event [:data "id"]) options)))
