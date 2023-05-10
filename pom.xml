@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.ajchemist</groupId>
   <artifactId>telegram.clj</artifactId>
-  <version>2023.93.20729</version>
+  <version>2023.130.10649</version>
   <scm>
     <url>https://github.com/ajchemist/telegram.clj</url>
   </scm>
