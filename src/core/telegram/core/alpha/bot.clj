@@ -152,7 +152,7 @@
   [command-handler etc]
   (fn
     [{:keys [event] :as context}]
-    (let [text   (get-in event [:data "text"])]
+    (let [text (get-in event [:data "text"])]
       (when (string? text)
         (let [parsed (parse-text text)]
           (when (map? parsed)
@@ -248,9 +248,10 @@
     [context command args]
     (let [handler (get-in cmd-defs [command :handler])]
       (if (fn? handler)
-        (if (allow? role-tree (get-in cmd-defs [command :requirements]) (:role context))
-          (apply handler context args)
-          (send-message context (str *no-command-permission-message* ": " command)))
+        (let [context' (assoc context :command/data (dissoc (get-in cmd-defs [command]) :handler))]
+          (if (allow? role-tree (get-in cmd-defs [command :requirements]) (:role context'))
+            (apply handler context' args)
+            (send-message context' (str *no-command-permission-message* ": " command))))
         nil))))
 
 
